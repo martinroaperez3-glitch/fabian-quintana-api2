@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php *)",
+      "Bash(curl *)",
+      "Bash(wsl *)",
+      "Bash(/c/tools/php85/php.exe *)",
+      "Bash(C:/tools/php85/php.exe -m)",
+      "Bash(findstr /i sqlite)",
+      "Bash(taskkill *)",
+      "Bash(flyctl deploy *)",
+      "Bash(choco *)",
+      "Bash(/c/Users/marti/.fly/flyctl version *)",
+      "Bash(/c/Users/marti/.fly/flyctl deploy *)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone *)",
+      "Bash(cp ecc/agents/react-reviewer.md .claude/agents/)",
+      "Bash(cp ecc/agents/react-build-resolver.md .claude/agents/)",
+      "Bash(mkdir -p .claude/skills/react-patterns .claude/skills/react-testing .claude/skills/react-performance)",
+      "Bash(cp ecc/skills/react-patterns/SKILL.md .claude/skills/react-patterns/)",
+      "Bash(cp ecc/skills/react-testing/SKILL.md .claude/skills/react-testing/)",
+      "Bash(cp ecc/skills/react-performance/SKILL.md .claude/skills/react-performance/)",
+      "Bash(mkdir -p /c/users/marti/.claude/agents)",
+      "Bash(cp ecc/agents/react-*.md /c/users/marti/.claude/agents/)",
+      "Bash(mkdir -p /c/users/marti/.claude/skills/react-patterns)",
+      "Bash(cp ecc/skills/react-patterns/SKILL.md /c/users/marti/.claude/skills/react-patterns/Skillusion)",
+      "Bash(mkdir -p /c/users/marti/.claude/skills/react-testing)",
+      "Bash(cp ecc/skills/react-testing/SKILL.md /c/users/marti/.claude/skills/react-testing/)",
+      "Bash(docker *)"
+    ]
+  }
+}
