@@ -208,7 +208,7 @@ const dateShort = iso => { const d=fromIso(iso); return `${DIAS_C[d.getDay()]} $
 
 
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+const API_BASE = 'https://fabian-quintana-api2-rbja4.sevalla.app/api';
 
 const DEFAULT_BARBER_ID = 1;
 
