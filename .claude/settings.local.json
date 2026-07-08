@@ -26,7 +26,8 @@
       "Bash(cp ecc/skills/react-patterns/SKILL.md /c/users/marti/.claude/skills/react-patterns/Skillusion)",
       "Bash(mkdir -p /c/users/marti/.claude/skills/react-testing)",
       "Bash(cp ecc/skills/react-testing/SKILL.md /c/users/marti/.claude/skills/react-testing/)",
-      "Bash(docker *)"
+      "Bash(docker *)",
+      "Bash(docker build *)"
     ]
   }
 }

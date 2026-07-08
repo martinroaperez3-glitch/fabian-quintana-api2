@@ -1,29 +1,45 @@
-FROM php:8.4-fpm
+# Stage 1: compile Vite assets
+FROM node:22-alpine AS frontend
 
-# Instalar dependencias necesarias para Laravel
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY vite.config.js ./
+COPY resources ./resources
+RUN npm run build
+
+# Stage 2: Laravel application
+FROM php:8.4-apache AS app
+
 RUN apt-get update && apt-get install -y \
     git curl libpng-dev libonig-dev libxml2-dev zip unzip libpq-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd \
+    && a2enmod rewrite \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instalar Composer y Node.js
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs
 
-WORKDIR /var/www
+WORKDIR /var/www/html
+
+COPY --from=frontend /app/public/build ./public/build
 COPY . .
 
-# Instalar dependencias y optimizar Laravel para producción
-RUN composer install --no-dev --optimize-autoloader
-RUN npm install && npm run build
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Configurar permisos de directorios
-RUN mkdir -p storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && mkdir -p storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
-# Crear script de arranque: Migra la BD, vincula el storage y corre PHP-FPM
-RUN echo '#!/bin/sh\n\
-php artisan migrate --force\n\
-php artisan storage:link\n\
-php-fpm' > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
+# Sevalla injects PORT at runtime; Apache must listen on that port.
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'set -e' \
+    'port="${PORT:-8080}"' \
+    'sed -i "s/Listen 80/Listen ${port}/" /etc/apache2/ports.conf' \
+    'exec apache2-foreground' \
+    > /usr/local/bin/start.sh \
+    && chmod +x /usr/local/bin/start.sh
 
-EXPOSE 9000
 CMD ["/usr/local/bin/start.sh"]
