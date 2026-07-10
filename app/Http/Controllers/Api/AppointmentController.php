@@ -66,7 +66,6 @@ class AppointmentController extends Controller
 
         DB::transaction(function () use ($barber, $data, $service, $start, $end, &$appointment) {
 
-            // lock rows to reduce race condition risk
             $conflict = Appointment::where('tenant_id', $barber->tenant_id)
                 ->where('barber_id', $barber->id)
                 ->where('appointment_date', $data['date'])
@@ -86,7 +85,7 @@ class AppointmentController extends Controller
                 'tenant_id'        => $barber->tenant_id,
                 'service_id'       => $service->id,
                 'barber_id'        => $barber->id,
-                'client_id'        => auth()->id(), // Esto guardará null si el cliente no está logueado, lo cual es correcto
+                'client_id'        => auth()->id(),
                 'client_name'      => $data['client_name'] ?? null,
                 'client_phone'     => $data['client_phone'] ?? null,
                 'client_email'     => $data['client_email'] ?? null,
@@ -116,8 +115,16 @@ class AppointmentController extends Controller
     // GET /api/v1/appointments
     public function index(Request $request): JsonResponse
     {
-        // CORRECCIÓN AQUÍ: Si hay un usuario logueado usa su tenant, sino asume el 1 (público)
-        $tenantId = auth()->check() ? auth()->user()->tenant_id : 1;
+        // Prioridad: 1) tenant_id explícito por query param
+        //            2) tenant del usuario autenticado
+        //            3) fallback a 1 (compatibilidad hacia atrás)
+        $request->validate([
+            'tenant_id' => 'nullable|integer|exists:tenants,id',
+        ]);
+
+        $tenantId = $request->filled('tenant_id')
+            ? (int) $request->tenant_id
+            : (auth()->check() ? auth()->user()->tenant_id : 1);
 
         $query = Appointment::query()
             ->where('tenant_id', $tenantId);
@@ -161,9 +168,11 @@ class AppointmentController extends Controller
             };
 
             if ($msg) {
+                $tenantName = optional($appointment->barber?->tenant)->name ?? 'Tu salón';
+
                 $this->push->notifyUser(
                     userId: $appointment->client_id,
-                    title: 'Fabián Quintana Salón',
+                    title: $tenantName,
                     body: $msg . ' — ' . $appointment->appointment_date . ' ' . substr($appointment->start_time, 0, 5),
                 );
             }
