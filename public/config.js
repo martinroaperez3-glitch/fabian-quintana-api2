@@ -355,39 +355,23 @@ const mapToApiAppointment = turno => ({
 
 
 const loadServices = async () => {
-
   try {
-
-    const services = await apiFetch(`${API_BASE}/services`);
-
-    if (Array.isArray(services) && services.length) {
-
+    const response = await apiFetch(`${API_BASE}/services`);
+    const services = Array.isArray(response) ? response : (response?.data ?? []);
+    if (services.length) {
       CFG.servicios = services.map(s => ({
-
         id: s.id,
-
         nombre: s.name,
-
         desc: s.description ?? '',
-
         precio: Number(s.price),
-
         precioOld: s.price_old ?? null,
-
         dur: s.duration_minutes,
-
         destacado: s.is_featured ?? false,
-
       }));
-
     }
-
   } catch (error) {
-
     console.warn('No se pudieron cargar servicios remotos, usando servicios locales.', error);
-
   }
-
 };
 
 
@@ -473,8 +457,9 @@ const replaceTurnoId = (oldId, remote) => {
 
 
 const fetchRemoteTurnos = async () => {
-  const data = await apiFetch(`${API_BASE}/appointments`);
-  return Array.isArray(data) ? data.map(normalizeAppointment) : [];
+  const response = await apiFetch(`${API_BASE}/appointments`);
+  const items = Array.isArray(response) ? response : (response?.data ?? []);
+  return items.map(normalizeAppointment);
 };
 
 
