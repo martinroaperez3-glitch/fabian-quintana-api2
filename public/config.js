@@ -473,11 +473,8 @@ const replaceTurnoId = (oldId, remote) => {
 
 
 const fetchRemoteTurnos = async () => {
-
   const data = await apiFetch(`${API_BASE}/appointments`);
-
   return Array.isArray(data) ? data.map(normalizeAppointment) : [];
-
 };
 
 
