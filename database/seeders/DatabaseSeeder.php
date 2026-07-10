@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name' => 'Fabián Quintana Salón',
-                'phone' => '+595981000000',
-                'whatsapp' => '595981000000',
+                'phone' => '+595985243599',
+                'whatsapp' => '+595985243599',
                 'address' => 'Encarnación',
                 'city' => 'Encarnación',
                 'country' => 'Paraguay',
@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
         // ==========================
         $user = User::firstOrCreate(
             [
-                'email' => 'admin@fabian.com'
+                'email' => 'martinroaperez2@gmail.com'
             ],
             [
                 'tenant_id' => $tenant->id,
